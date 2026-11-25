@@ -21,3 +21,5 @@ Excelは6シート、CSVは人物法人関係。Excelの表は文字列として
 利用規約・料金: https://ai.google.dev/gemini-api/docs/terms / https://ai.google.dev/gemini-api/docs/pricing
 
 【接続修正版】表示Ver.1.0維持。AI接続テスト追加。Tavily利用条件：https://tavily.com/terms
+
+【スキャンPDF解析修正版】表示Ver.1.0維持。GeminiのJSON Schema指定、全表の画像読み取り指示、空欄所在地でも抽出、形式正規化を追加。直接PDF解析で有効な名簿が得られない場合のみPDF.js（jsDelivr CDN、最大4ページ）でページ画像化して1回再試行。CDNが遮断された場合はページ画像・テキスト登録。無料枠エラーでは再試行しない。追加のAPI呼び出しは無料枠を消費しうる。実APIおよび実機は未検証。
