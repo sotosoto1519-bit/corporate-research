@@ -1,28 +1,21 @@
-法人リサーチ AI Ver.0.6 — 個人用クラウド版
+法人リサーチ AI Ver.1.0 / 歴代役員・関連法人調査
 
-初回設定（Windows PC）
-1. https://aistudio.google.com/apikey で無料プランのプロジェクトのAPIキーを発行。課金を有効にしないこと。既存の有料プロジェクトを使わないこと。
-2. https://dash.cloudflare.com/ で無料アカウントを作成。Workers Freeを選択。
-3. https://nodejs.org/ からNode.js LTSをインストール。
-4. ZIPを展開し、そのフォルダでPowerShellまたはコマンドプロンプトを開く。
-5. 次のコマンドを順に実行する。
-   npx wrangler login
-   npx wrangler deploy
-   npx wrangler secret put GEMINI_API_KEY
-   npx wrangler secret put APP_PASSWORD
-   APIキーと自分専用の長いランダムな英数字パスワードをそれぞれ入力。公開チャットに貼らない。
-6. deploy時に表示された https://...workers.dev をPC/iPadのブラウザで開く。
-   ユーザー名 owner / 設定したパスワードでログイン。
-7. iPadではSafariの共有→ホーム画面に追加。
+【既にCloudflareとGitHubを連携した方】
+1. GitHubの corporate-research が Private であることを確認。
+2. このZIPを展開し、README.txt、worker.mjs、wrangler.jsonc、publicフォルダの中身を、既存のリポジトリの同じ位置にアップロードしてコミット（上書き）。ZIP自体をアップロードしない。
+3. wrangler.jsonc の name は Cloudflareの実際のWorker名に合わせる。この配布版は corporate-research に設定。既存名が corporate-research-ai ならその値だけ修正。
+4. Cloudflareの自動ビルドが成功したことを確認。ビルドコマンドは空欄、デプロイコマンド npx wrangler deploy。PCへのインストール不要。
+5. Workerの設定 > 変数とシークレットに、シークレットとして GEMINI_API_KEY と APP_PASSWORD を設定。APIキーはGoogle AI Studioの課金無効の無料プロジェクトから発行。パスワードは長いランダムな半角英数字。GitHubやチャットに貼らない。
+6. WorkerのURLにアクセス。ユーザー名 owner / 設定したパスワード。APP_PASSWORD未設定時はアクセス拒否。旧URLがそのまま使用可能な場合あり。
+7. サンプルで画面とExcel出力を試し、その後公開名簿1件でAPIテスト。会社の外部AI利用規定を確認。
 
-使い方
-公開されたPDF、DOCX、XLSX、CSV、TXT、PNG、JPEG、WEBPを選択（複数可）。公開資料の確認にチェックし、自動調査開始。法人と役員を抽出して4名ずつ検索する。結果は端末のブラウザ内に保存。CSVで移行・保管可能。履歴は端末間で同期しない。
-Word/Excelは内部XMLを抽出してAIに渡す。旧DOC/XLSは変換が必要。埋め込み画像、複雑な書式、暗号化ファイルは非対応。1ファイル8MB、送信全体約16MBまで。Office解析に外部CDNのfflateを使用。
-モデル: gemini-2.5-flash-lite。無料枠は変動する。429などのエラーで停止し、別モデルや有料サービスへの自動切替はしない。無料枠の数値をアプリが独自に検証する仕組みはないため、課金無効のプロジェクトが必須。停止ボタンは以降の処理を止めるが送信済みリクエストは取消できない場合がある。
-全候補は要確認扱い。出典URLと検索メタデータを照合し、人の同一性・法人情報を確認してから使用する。個人の私的連絡先は対象外。無料APIへの送信データはGoogleのサービス改善に利用される場合がある。公開資料以外は送信しない。
+【操作】
+複数年のPDF、DOCX、XLSX、CSV、画像、TXTをまとめて選択し、公開資料確認にチェック、名簿を解析。資料を1件ずつ処理しSHA-256で同じファイルの再投入を防ぐ。途中保存済みなら次回同じ資料を選んでもスキップ。未処理ファイルは画面終了後は再選択が必要。
+抽出結果・年度の修正を開き、法人名と地域の表記を揃える。年度を確認し、全員掲載の名簿であると確認できたものだけチェック。名簿の掲載年度と就退任日は別。同じ法人・地域・正規化氏名の暫定統合。異なる同姓同名は区別IDを入力して分離（同じ人の全年度に同じIDを設定）。表記揺れは手動修正。法人地域が違えば別グループになるため必要に応じて表記統一。氏名等を修正すると検索キーが変わるため再調査。前の検索結果はバックアップ内に残る場合がある。
+未調査者を一括調査 / 選択した人を調査・再調査。1名1リクエスト。地域と名簿役職・掲載年を手掛かりに検索。検索出典が返らなければ停止し未調査のまま。無料枠制限では停止し続きから再開。再調査は当該人の結果を置換するため先にバックアップ推奨。停止は以降の処理を止めるが送信済みリクエストは消費されうる。
+歴代役員 / 年度別・変遷 / 関連法人 / 法人相関図 / 情報ソース の各タブ。氏名・法人・役職で絞り込み、ランクで人物を絞り込み。法人候補は法人番号または名前と所在地で統合、D判定は営業候補から除外。営業状態・優先度は手動設定。個別詳細でランク修正・確認済み・メモ。判定は全て暫定であり、Sも本人確認を保証しない。AI提示URLと検索メタデータの根拠候補を区別。対応候補がない場合は原則Cに制限。URLを開いて内容・時点・人物を確認。
+Excelは6シート、CSVは人物法人関係。Excelの表は文字列として出力。バックアップJSONで別端末へ移行。データは端末のlocalStorage（容量制限あり）で、同期なし。会社PC等で共有ブラウザを使わない。バックアップは機密管理し、GitHubに入れない。
 
-料金: https://ai.google.dev/gemini-api/docs/pricing
-利用条件: https://ai.google.dev/gemini-api/terms
-Workers: https://developers.cloudflare.com/workers/
-
-検証: JavaScript構文チェック済み。実API、公開環境、iPad実機は未検証。APIキー・Cloudflareアカウントは同梱していない。
+【制限】
+1ファイル8MB、Office XMLの抽出テキスト50万文字。旧DOC/XLS、暗号化、埋込画像、複雑な書式は未対応。画像化したWord/ExcelはPDF等に変換。Office解析およびExcel作成は外部CDNのfflate 0.8.2を使用（CDNアクセスが会社で禁止されると利用不可）。ブラウザでの元資料解析とAIへの送信を行う。クラウド上に履歴は保存しない。モデルは gemini-2.5-flash-lite 固定。無料枠をアプリが独自に保証・検知するわけではない。課金無効のプロジェクトを使用すること。429等で停止。有料モデルへの自動切替なし。無料APIデータ利用条件により公開資料のみ。個人の自宅・私的連絡先は対象外。
+利用規約・料金: https://ai.google.dev/gemini-api/docs/terms / https://ai.google.dev/gemini-api/docs/pricing

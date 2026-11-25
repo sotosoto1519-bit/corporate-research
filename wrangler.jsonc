@@ -1,1 +1,6 @@
-{"name":"corporate-research-ai","main":"worker.mjs","compatibility_date":"2026-11-25","assets":{"directory":"./public","binding":"ASSETS","run_worker_first":true}}
+{
+  "name": "corporate-research",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-11-25",
+  "assets": {"directory": "./public", "binding": "ASSETS", "run_worker_first": true}
+}
